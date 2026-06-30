@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartAttendance</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 110'%3E%3Cpath d='M50 4 L92 22 L92 52 C92 80 74 98 50 106 C26 98 8 80 8 52 L8 22 Z' fill='none' stroke='%232c4a6e' stroke-width='8'/%3E%3Ccircle cx='36' cy='48' r='5' fill='%232c4a6e'/%3E%3Ccircle cx='64' cy='48' r='5' fill='%232c4a6e'/%3E%3Cpath d='M34 62 Q50 76 66 62' fill='none' stroke='%232c4a6e' stroke-width='6' stroke-linecap='round'/%3E%3Cpath d='M28 70 L42 84 L74 50' fill='none' stroke='%235b9bd5' stroke-width='9' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     AUTH SCREEN
+============================================================ -->
+<div id="auth-screen" class="auth-wrap">
+  <img class="auth-bg-mark" src="/static/logo-icon.png" alt="">
+  <div class="auth-card">
+    <div class="auth-logo-bar">
+      <div class="logo-mark">
+        <img src="/static/logo-icon.png" alt="SmartAttendance">
+      </div>
+      <div class="logo-text-wrap">
+        <div class="logo-name">SmartAttendance</div>
+        <div class="logo-sub">Face Detection Portal</div>
+      </div>
+    </div>
+
+    <!-- Role tabs: Instructor / Student -->
+    <div class="role-tabs">
+      <div class="role-tab active" id="role-tab-instructor" onclick="setAuthRole('instructor')">Instructor</div>
+      <div class="role-tab" id="role-tab-student" onclick="setAuthRole('student')">Student</div>
+    </div>
+
+    <div class="auth-body">
+
+      <!-- ===== Instructor: Sign in / Register ===== -->
+      <div id="auth-instructor">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="itab-login" onclick="showAuthForm('instructor','login')">Sign In</div>
+          <div class="auth-tab" id="itab-register" onclick="showAuthForm('instructor','register')">Create Account</div>
+        </div>
+
+        <div id="instructor-login-form">
+          <div id="ilogin-error" class="auth-error"></div>
+          <form onsubmit="handleInstructorLogin(event)">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input id="ilogin-email" class="form-input" type="email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input id="ilogin-password" class="form-input" type="password" required>
+            </div>
+            <div class="auth-link-row">
+              <span></span>
+              <a href="#" onclick="openForgotPassword('instructor');return false">Forgot password?</a>
+            </div>
+            <button id="ilogin-btn" class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Sign In</button>
+          </form>
+        </div>
+
+        <div id="instructor-register-form" style="display:none">
+          <div id="ireg-error" class="auth-error"></div>
+          <form onsubmit="handleInstructorRegister(event)">
+            <div class="form-group">
+              <label class="form-label">Full Name <span class="req">*</span></label>
+              <input id="ireg-name" class="form-input" type="text" placeholder="Prof. Jane Smith" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email <span class="req">*</span></label>
+              <input id="ireg-email" class="form-input" type="email" placeholder="you@university.edu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password <span class="req">*</span></label>
+              <input id="ireg-password" class="form-input" type="password" placeholder="Min. 8 characters" required>
+            </div>
+            <button id="ireg-btn" class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Create Account</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- ===== Student: Sign in / Register ===== -->
+      <div id="auth-student" style="display:none">
+        <div class="auth-tabs">
+          <div class="auth-tab active" id="stab-login" onclick="showAuthForm('student','login')">Sign In</div>
+          <div class="auth-tab" id="stab-register" onclick="showAuthForm('student','register')">Create Account</div>
+        </div>
+
+        <div id="student-login-form">
+          <div id="slogin-error" class="auth-error"></div>
+          <form onsubmit="handleStudentLogin(event)">
+            <div class="form-group">
+              <label class="form-label">School Email</label>
+              <input id="slogin-email" class="form-input" type="email" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password</label>
+              <input id="slogin-password" class="form-input" type="password" required>
+            </div>
+            <div class="auth-link-row">
+              <span></span>
+              <a href="#" onclick="openForgotPassword('student');return false">Forgot password?</a>
+            </div>
+            <button id="slogin-btn" class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Sign In</button>
+          </form>
+        </div>
+
+        <div id="student-register-form" style="display:none">
+          <div id="sreg-error" class="auth-error"></div>
+          <form onsubmit="handleStudentRegister(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">First Name <span class="req">*</span></label>
+                <input id="sreg-first" class="form-input" placeholder="First name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Middle Name</label>
+                <input id="sreg-middle" class="form-input" placeholder="Optional">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Last Name <span class="req">*</span></label>
+              <input id="sreg-last" class="form-input" placeholder="Last name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Student ID <span class="req">*</span></label>
+              <input id="sreg-sid" class="form-input" placeholder="e.g. S10021" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">School Email <span class="req">*</span></label>
+              <input id="sreg-email" class="form-input" type="email" placeholder="you@university.edu" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Password <span class="req">*</span></label>
+              <input id="sreg-password" class="form-input" type="password" placeholder="Min. 8 characters" required>
+            </div>
+            <button id="sreg-btn" class="btn btn-primary" type="submit" style="width:100%;justify-content:center">Create Account</button>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     FORGOT PASSWORD MODAL
+============================================================ -->
+<div class="modal-overlay" id="modal-forgot">
+  <div class="modal" style="width:420px">
+    <div class="modal-header">
+      <span class="modal-title">Reset Password</span>
+      <button class="modal-close" onclick="closeModal('forgot')">&times;</button>
+    </div>
+    <div class="modal-body">
+
+      <!-- Step 1: request -->
+      <div id="forgot-step-1">
+        <p style="font-size:13px;color:var(--text-sub);margin-bottom:14px">Enter the email associated with your account. We'll send a reset link.</p>
+        <div id="forgot-error" class="auth-error"></div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input id="forgot-email" class="form-input" type="email" placeholder="you@university.edu">
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitForgotPassword()">Send Reset Link</button>
+      </div>
+
+      <!-- Step 2: confirmation -->
+      <div id="forgot-step-2" style="display:none">
+        <div class="alert alert-success">
+          <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+          <span>If an account exists with that email, a reset link has been sent. Check your inbox.</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-sub)">For this demo, check the server console/logs to see the reset link, since no real email service is connected yet.</p>
+        <button class="btn btn-secondary" style="width:100%;justify-content:center;margin-top:10px" onclick="closeModal('forgot')">Close</button>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     APP SCREEN (Instructor + Student)
+============================================================ -->
+<div id="app-screen" style="display:none">
+  <div class="app-wrap">
+
+    <!-- Sidebar -->
+    <nav id="sidebar">
+      <div class="sidebar-logo-bar">
+        <div class="logo-mark">
+          <img src="/static/logo-icon.png" alt="SmartAttendance">
+        </div>
+        <div class="logo-text-wrap">
+          <div class="logo-name">SmartAttendance</div>
+          <div class="logo-sub" id="sidebar-role-label">Instructor Portal</div>
+        </div>
+      </div>
+
+      <!-- Instructor nav -->
+      <div id="nav-instructor" style="display:none">
+        <div class="sidebar-section">
+          <div class="sidebar-label">Overview</div>
+          <div class="sidebar-item active" data-page="dashboard" onclick="navigate('dashboard')">
+            <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+            Dashboard
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-label">Management</div>
+          <div class="sidebar-item" data-page="classes" onclick="navigate('classes')">
+            <svg viewBox="0 0 24 24"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>
+            Classes
+          </div>
+          <div class="sidebar-item" data-page="students" onclick="navigate('students')">
+            <svg viewBox="0 0 24 24"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Students
+          </div>
+          <div class="sidebar-item" data-page="timetable" onclick="navigate('timetable')">
+            <svg viewBox="0 0 24 24"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM5 8V6h14v2H5z"/></svg>
+            Timetable &amp; Verification
+          </div>
+        </div>
+        <div class="sidebar-section">
+          <div class="sidebar-label">Data</div>
+          <div class="sidebar-item" data-page="viewdata" onclick="navigate('viewdata')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            View Data
+          </div>
+          <div class="sidebar-item" data-page="export" onclick="navigate('export')">
+            <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+            Export Data
+          </div>
+          <div class="sidebar-item" data-page="unlabeled" onclick="navigate('unlabeled')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
+            Unlabeled
+            <span id="unlabeled-badge" class="badge badge-warning" style="margin-left:auto;font-size:10px">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Student nav -->
+      <div id="nav-student" style="display:none">
+        <div class="sidebar-section">
+          <div class="sidebar-item active" data-page="student-join" onclick="navigate('student-join')">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/></svg>
+            Join a Class
+          </div>
+          <div class="sidebar-item" data-page="student-profile" onclick="navigate('student-profile')">
+            <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            Profile Photo
+          </div>
+          <div class="sidebar-item" data-page="student-submit" onclick="navigate('student-submit')">
+            <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+            Submit Samples
+          </div>
+          <div class="sidebar-item" data-page="student-verify" onclick="navigate('student-verify')">
+            <svg viewBox="0 0 24 24"><path d="M4 4h4V2H4c-1.1 0-2 .9-2 2v4h2V4zm12 0h4v4h2V4c0-1.1-.9-2-2-2h-4v2zM4 20v-4H2v4c0 1.1.9 2 2 2h4v-2H4zm16-4v4h-4v2h4c1.1 0 2-.9 2-2v-4h-2zM12 9a3 3 0 100 6 3 3 0 000-6z"/></svg>
+            Class Verification
+          </div>
+          <div class="sidebar-item" data-page="student-status" onclick="navigate('student-status')">
+            <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+            My Progress
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
+        <strong id="sidebar-username">—</strong>
+        <button class="btn btn-sm btn-secondary" style="width:100%;justify-content:center" onclick="handleLogout()">Sign Out</button>
+      </div>
+    </nav>
+
+    <!-- Top bar -->
+    <div id="topbar">
+      <div class="topbar-crumb">SmartAttendance &rsaquo; <strong id="breadcrumb-page">Dashboard</strong></div>
+      <div class="topbar-right">
+        <div id="topbar-role-badge" class="badge badge-info">Instructor</div>
+        <div class="avatar" id="topbar-avatar" style="background:var(--red)">—</div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <main id="main">
+
+      <!-- ==================== INSTRUCTOR: DASHBOARD ==================== -->
+      <div id="page-dashboard" class="page active">
+        <div class="page-header">
+          <div><h1>Dashboard</h1><p>Overview of your face detection classes.</p></div>
+          <button class="btn btn-primary" onclick="openModal('new-class')">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            New Class
+          </button>
+        </div>
+        <div class="stats-row">
+          <div class="stat-card"><div class="stat-label">Active Classes</div><div class="stat-value red" id="stat-classes">—</div><div class="stat-sub">This semester</div></div>
+          <div class="stat-card"><div class="stat-label">Enrolled Students</div><div class="stat-value" id="stat-students">—</div><div class="stat-sub">Across all classes</div></div>
+          <div class="stat-card"><div class="stat-label">Total Samples</div><div class="stat-value" id="stat-samples">—</div><div class="stat-sub" id="stat-labeled-sub">Labeled: —</div></div>
+          <div class="stat-card"><div class="stat-label">Unlabeled</div><div class="stat-value yellow" id="stat-unlabeled">—</div><div class="stat-sub"><a href="#" onclick="navigate('unlabeled');return false">Review now</a></div></div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Your Classes</span><button class="btn btn-sm btn-link" onclick="navigate('classes')">View all</button></div>
+          <div class="card-body"><div class="classes-grid" id="classes-grid-dashboard"></div></div>
+        </div>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: CLASSES ==================== -->
+      <div id="page-classes" class="page">
+        <div class="page-header">
+          <div><h1>Classes</h1><p>Create classes and share the code with your students.</p></div>
+          <button class="btn btn-primary" onclick="openModal('new-class')">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            New Class
+          </button>
+        </div>
+        <div class="classes-grid" id="classes-grid-page"></div>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: STUDENTS ==================== -->
+      <div id="page-students" class="page">
+        <div class="page-header"><div><h1>Students</h1><p>Students join by entering the class code themselves.</p></div></div>
+        <div class="alert alert-info">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+          <span>Share your class code from the Classes page. Students register their own account and join with that code.</span>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+            <input id="student-search" class="search-input" placeholder="Search by name or ID…" oninput="filterStudents()">
+            <select id="student-class-filter" class="select-input" onchange="filterStudents()"><option value="">All classes</option></select>
+          </div>
+          <table>
+            <thead><tr><th>Student</th><th>ID</th><th>Class</th><th>Profile Photo</th><th>Samples</th><th>Status</th></tr></thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: TIMETABLE & VERIFICATION ==================== -->
+      <div id="page-timetable" class="page">
+        <div class="page-header"><div><h1>Timetable &amp; Verification</h1><p>Set class meeting times and control when facial verification is open.</p></div></div>
+        <div id="timetable-classes"></div>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: VIEW DATA ==================== -->
+      <div id="page-viewdata" class="page">
+        <div class="page-header"><div><h1>View Data</h1><p>Analyze sample data by class or individual student.</p></div></div>
+        <div class="tabs">
+          <div class="tab active" onclick="switchTab(this,'panel-class')">Class Overview</div>
+          <div class="tab" onclick="switchTab(this,'panel-individual')">Individual Students</div>
+        </div>
+        <div id="panel-class" class="tab-panel active">
+          <div class="table-wrap">
+            <div class="table-toolbar" style="background:var(--bg)"><span style="font-size:13px;font-weight:700">Sample distribution by class</span></div>
+            <table>
+              <thead><tr><th>Class</th><th>Students</th><th>Total Samples</th><th>Labeled</th><th>Unlabeled</th><th>Completion</th></tr></thead>
+              <tbody id="class-data-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="panel-individual" class="tab-panel">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Student</th><th>Class</th><th>Samples</th><th>Varieties Captured</th><th>Status</th></tr></thead>
+              <tbody id="individual-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: EXPORT ==================== -->
+      <div id="page-export" class="page">
+        <div class="page-header"><div><h1>Export Data</h1><p>Download datasets for model training or analysis.</p></div></div>
+        <div class="card" style="max-width:560px">
+          <div class="card-header"><span class="card-title">Format</span></div>
+          <div class="card-body">
+            <div class="export-grid">
+              <div class="export-opt selected" data-format="csv" onclick="selectExportFormat(this)"><div class="export-opt-icon">CSV</div><div class="export-opt-name">Spreadsheet</div><div class="export-opt-desc">Metadata &amp; labels</div></div>
+              <div class="export-opt" data-format="json" onclick="selectExportFormat(this)"><div class="export-opt-icon">JSON</div><div class="export-opt-name">JSON</div><div class="export-opt-desc">Full manifest</div></div>
+              <div class="export-opt" data-format="zip" onclick="selectExportFormat(this)"><div class="export-opt-icon">ZIP</div><div class="export-opt-name">Image Archive</div><div class="export-opt-desc">Labeled folders</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="max-width:560px">
+          <div class="card-header"><span class="card-title">Filters</span></div>
+          <div class="card-body">
+            <div class="form-row">
+              <div class="form-group"><label class="form-label">Class</label><select id="export-class-filter" class="form-input"><option value="">All classes</option></select></div>
+              <div class="form-group"><label class="form-label">Samples to include</label><select id="export-labeled-filter" class="form-input"><option value="labeled">Labeled only</option><option value="all">All samples</option></select></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" onclick="triggerExport()">
+          <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+          Export Dataset
+        </button>
+      </div>
+
+      <!-- ==================== INSTRUCTOR: UNLABELED ==================== -->
+      <div id="page-unlabeled" class="page">
+        <div class="page-header">
+          <div><h1>Unlabeled Samples</h1><p>Assign unidentified face captures to a student.</p></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn btn-secondary" onclick="showToast('Selected samples skipped.')">Skip Selected</button>
+            <button class="btn btn-primary" onclick="assignLabel()">Save Labels</button>
+          </div>
+        </div>
+        <div class="alert alert-warning">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <span>Select one or more samples, then assign them to a student below.</span>
+        </div>
+        <div id="unlabeled-grid" class="unlabeled-grid"></div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Assign selected samples</span></div>
+          <div class="card-body">
+            <div style="display:flex;gap:10px;align-items:flex-end">
+              <div class="form-group" style="flex:1;margin-bottom:0"><label class="form-label">Assign to student</label><select id="label-student-select" class="form-input"></select></div>
+              <button class="btn btn-primary" onclick="assignLabel()">Assign</button>
+              <button class="btn btn-secondary" onclick="showToast('Marked as unknown.')">Mark Unknown</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STUDENT: JOIN ==================== -->
+      <div id="page-student-join" class="page">
+        <div class="page-header"><div><h1>Join a Class</h1><p>Enter the code your instructor gave you.</p></div></div>
+        <div class="join-card">
+          <div class="card-header"><span class="card-title">Enter class code</span></div>
+          <div class="card-body">
+            <div id="join-error" class="auth-error"></div>
+            <div class="form-group">
+              <label class="form-label">Class Code <span class="req">*</span></label>
+              <input id="join-code-input" class="form-input" placeholder="e.g. CS401-0001" style="font-size:16px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase">
+            </div>
+            <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="joinClass()">Join Class</button>
+          </div>
+        </div>
+        <div class="card" style="max-width:480px;margin:0 auto" id="my-classes-card" style="display:none">
+          <div class="card-header"><span class="card-title">My Classes</span></div>
+          <div class="card-body" id="my-classes-list"></div>
+        </div>
+      </div>
+
+      <!-- ==================== STUDENT: PROFILE PHOTO ==================== -->
+      <div id="page-student-profile" class="page">
+        <div class="page-header"><div><h1>Profile Photo</h1><p>Upload a clear photo of your face. This is used to verify you during class attendance.</p></div></div>
+        <div class="join-card">
+          <div class="card-header"><span class="card-title">Your reference photo</span></div>
+          <div class="card-body" style="text-align:center">
+            <div class="profile-photo-box" id="profile-photo-box" onclick="document.getElementById('profile-photo-input').click()">
+              <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+            </div>
+            <input id="profile-photo-input" type="file" accept="image/*" style="display:none" onchange="handlePhotoSelect(event)">
+            <button class="btn btn-secondary" onclick="document.getElementById('profile-photo-input').click()">Choose Photo</button>
+            <p class="form-hint" style="margin-top:10px">Use a well-lit, front-facing photo with no sunglasses or masks.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STUDENT: SUBMIT SAMPLES ==================== -->
+      <div id="page-student-submit" class="page">
+        <div class="page-header"><div><h1>Submit Face Samples</h1><p>Upload samples for each appearance variety.</p></div></div>
+        <div id="student-not-joined" class="alert alert-warning">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <span>You must join a class first. <a href="#" onclick="navigate('student-join');return false">Join a class</a></span>
+        </div>
+        <div id="student-submit-form" style="display:none">
+          <div class="form-group" style="max-width:320px">
+            <label class="form-label">Class</label>
+            <select id="submit-class-select" class="form-input" onchange="onSubmitClassChange()"></select>
+          </div>
+          <div class="alert alert-info">
+            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            <span>Submit at least <strong id="min-samples-label">20 samples</strong> per variety.</span>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title">Appearance Varieties</span></div>
+            <div class="card-body"><div class="sample-variety-grid" id="variety-grid"></div></div>
+          </div>
+          <div class="card">
+            <div class="card-header"><span class="card-title" id="upload-variety-title">Upload samples</span></div>
+            <div class="card-body">
+              <div class="form-group">
+                <label class="form-label">Select images</label>
+                <input id="sample-upload-input" class="form-input" type="file" accept="image/*" multiple>
+                <div class="form-hint">Select multiple images at once.</div>
+              </div>
+              <button class="btn btn-primary" onclick="uploadSamples()">Upload Samples</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STUDENT: VERIFICATION ==================== -->
+      <div id="page-student-verify" class="page">
+        <div class="page-header"><div><h1>Class Verification</h1><p>Verify your attendance with facial recognition during class hours.</p></div></div>
+        <div id="verify-not-joined" class="alert alert-warning">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <span>You must join a class first. <a href="#" onclick="navigate('student-join');return false">Join a class</a></span>
+        </div>
+        <div id="verify-content" style="display:none">
+          <div class="form-group" style="max-width:320px">
+            <label class="form-label">Class</label>
+            <select id="verify-class-select" class="form-input" onchange="onVerifyClassChange()"></select>
+          </div>
+          <div id="verify-banner" class="verify-banner closed">
+            <div>
+              <div class="verify-banner-title" id="verify-banner-title">Verification Closed</div>
+              <div class="verify-banner-sub" id="verify-banner-sub">Your instructor hasn't opened verification yet.</div>
+            </div>
+          </div>
+          <div class="join-card" style="margin:0 auto">
+            <div class="card-header"><span class="card-title">Camera</span></div>
+            <div class="card-body" style="text-align:center">
+              <div class="verify-result" id="verify-result"></div>
+              <div class="camera-box" id="camera-box">
+                <svg viewBox="0 0 24 24"><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                <div class="camera-frame-corner tl"></div>
+                <div class="camera-frame-corner tr"></div>
+                <div class="camera-frame-corner bl"></div>
+                <div class="camera-frame-corner br"></div>
+              </div>
+              <button class="btn btn-primary" id="verify-now-btn" onclick="runVerification()" disabled style="width:100%;max-width:420px;justify-content:center">Verify Now</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==================== STUDENT: STATUS ==================== -->
+      <div id="page-student-status" class="page">
+        <div class="page-header"><div><h1>My Progress</h1><p>Track your sample submission and attendance history.</p></div></div>
+        <div id="status-not-joined" class="alert alert-warning">
+          <svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg>
+          <span>You must join a class first. <a href="#" onclick="navigate('student-join');return false">Join a class</a></span>
+        </div>
+        <div id="status-content" style="display:none">
+          <div class="form-group" style="max-width:320px">
+            <label class="form-label">Class</label>
+            <select id="status-class-select" class="form-input" onchange="renderStudentStatus()"></select>
+          </div>
+          <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+            <div class="stat-card"><div class="stat-label">Class</div><div class="stat-value" style="font-size:16px" id="status-class-name">—</div></div>
+            <div class="stat-card"><div class="stat-label">Samples Submitted</div><div class="stat-value green" id="status-sample-count">0</div></div>
+            <div class="stat-card"><div class="stat-label">Required</div><div class="stat-value" id="status-required">—</div></div>
+          </div>
+          <div class="table-wrap">
+            <div class="table-toolbar" style="background:var(--bg)"><span style="font-weight:700;font-size:13px">Recent attendance verifications</span></div>
+            <table>
+              <thead><tr><th>Date</th><th>Result</th><th>Confidence</th></tr></thead>
+              <tbody id="status-attendance-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- MODAL — New Class -->
+<div class="modal-overlay" id="modal-new-class">
+  <div class="modal">
+    <div class="modal-header"><span class="modal-title">Create New Class</span><button class="modal-close" onclick="closeModal('new-class')">&times;</button></div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Class Name <span class="req">*</span></label><input id="new-class-name" class="form-input" placeholder="e.g. Computer Vision Fall 2026"></div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Course ID <span class="req">*</span></label><input id="new-class-courseid" class="form-input" placeholder="e.g. CS 401"></div>
+        <div class="form-group"><label class="form-label">Section</label><input id="new-class-section" class="form-input" placeholder="001"></div>
+      </div>
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">Semester</label><select id="new-class-semester" class="form-input"><option>Fall 2026</option><option>Spring 2027</option><option>Summer 2027</option></select></div>
+        <div class="form-group"><label class="form-label">Min. Samples per Variety</label><input id="new-class-minsamples" class="form-input" type="number" value="20" min="5"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Weekly Meeting Time</label>
+        <div class="form-row">
+          <select id="new-class-day" class="form-input">
+            <option value="0">Monday</option><option value="1">Tuesday</option><option value="2">Wednesday</option>
+            <option value="3">Thursday</option><option value="4">Friday</option><option value="5">Saturday</option><option value="6">Sunday</option>
+          </select>
+          <div style="display:flex;gap:6px;align-items:center">
+            <input id="new-class-start" class="form-input" type="time" value="17:30">
+            <span style="color:var(--text-sub)">to</span>
+            <input id="new-class-end" class="form-input" type="time" value="18:45">
+          </div>
+        </div>
+        <div class="form-hint">You can add more meeting times later from the Timetable page.</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('new-class')">Cancel</button>
+      <button class="btn btn-primary" onclick="createClass()">Create Class</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"><span id="toast-icon">&#10003;</span><span id="toast-msg"></span></div>
+
+<script src="/static/js/api.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>

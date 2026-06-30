@@ -1,0 +1,26 @@
+databases:
+  - name: smartattendance-db
+    plan: free
+
+services:
+  - type: web
+    name: smartattendance
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: smartattendance-db
+          property: connectionString
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: FROM_EMAIL
+        value: no-reply@smartattendance.com
+      - key: APP_BASE_URL
+        sync: false
